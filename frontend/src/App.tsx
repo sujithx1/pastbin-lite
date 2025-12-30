@@ -1,39 +1,16 @@
-import { useState } from "react";
-import api from "./instance/axios";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-function App() {
-  const [content, setContent] = useState("");
-  const [url, setUrl] = useState("");
+import CreatePaste from "./components/CreatePaste";
+import ViewPaste from "./components/ViewPaste";
 
-  async function createPaste() {
-
-
-    try {
-        const res=await api.post("/api/pastes",{
-      content 
-    })
-
-      const data = await res.data;
-      setUrl(data.url);
-
-    } catch (error) {
-      console.log(error);
-      
-    }
-  }
-
+export default function App() {
   return (
-    <div style={{ padding: 40 }}>
-      <textarea
-        rows={10}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      <br />
-      <button onClick={createPaste}>Create Paste</button>
-      {url && <p><a href={url}>{url}</a></p>}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<CreatePaste />} />
+        <Route path="/p/:id" element={<ViewPaste />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
-export default App;

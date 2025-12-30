@@ -9,7 +9,7 @@
         try {
             const { content, ttl_seconds, max_views } = req.body;
         
-        console.log(req.body);
+        console.log(content, ttl_seconds, max_views);
         
         if (!content || typeof content !== "string" || !content.trim()) {
             return res.status(400).json({ error: "Invalid content" });
@@ -29,6 +29,7 @@
             remaining_views: max_views ?? null,
             expires_at: ttl_seconds ? now + ttl_seconds * 1000 : null,
         };
+        
         
         const key = `paste:${id}`;
         
