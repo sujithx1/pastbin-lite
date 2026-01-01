@@ -1,5 +1,6 @@
 // frontend/src/api.ts
 
+import { isAxiosError } from "axios";
 import api from "./instance/axios";
 
 export interface PasteResponse {
@@ -13,16 +14,41 @@ export interface PasteData {
   expires_at: string | null;
 }
 
-export const createPaste = async (content: string, ttl?: number, maxViews?: number) => {
-  const res = await api.post("/pastes", { content, ttl_seconds: ttl, max_views: maxViews });
-  if (!res.data) throw new Error("Error creating paste");
-  return res.data as Promise<PasteResponse>;
+export interface PasteOptions {
+  content: string;
+  ttl?: number;
+  maxViews?: number;
+}
+export const createPaste = async ({ content, ttl, maxViews }:PasteOptions)=> {
+  try {
+    const res = await api.post("/pastes", {
+      content: content.trim(),
+      ttl_seconds: ttl,
+      max_views: maxViews,
+    });
+
+    // Axios throws on non-2xx codes, so if we are here, res.data exists
+    return res.data;
+    
+  } catch (error) {
+    if(isAxiosError(error)){
+      throw new Error(error.response?.data?.message || "Failed to create paste. Please try again.");
+    }
+    throw new Error("Failed to create paste. Please try again.");
+  }
 };
 
 export const getPaste = async (id: string) => {
-  const res = await api.get(`/pastes/${id}`);
-  if (!res.data) throw new Error("Paste not found or expired");
-  return res.data as Promise<PasteData>;
+  try{
+    const res = await api.get(`/pastes/${id}`);
+  return res.data ;
+
+  }catch (error) {
+    if(isAxiosError(error)){
+      throw new Error(error.response?.data?.message || "Failed to get paste. Please try again.");
+    }
+    throw new Error("Failed to get paste. Please try again.");
+  }
 };
 
 // export const useHealthz = () => {
